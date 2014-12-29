@@ -8,12 +8,14 @@
 #
 # USAGE
 #
-# set :default_ip as the intial ip you want to sync in the config map below
-# (following addresses will be store in the ~/.hostipsync file)
+# sudo ./hostipsync.rb 192.168.x.y
+#
+# where 192.168.x.y is the initial ip that you want to replace in your host config file
+# (following addresses will be store in the ~/.hostipsync file, 
+#  all you will need to do is call sudo ./hostipsync.rb)
 #
 # @jcbatista 2014
 #
-
 config = {
 		 	:vm_name => 'Windows 8 x64',
 		 	:vm_path => '/Users/jcb/Documents',
@@ -27,8 +29,9 @@ class HostIpSync
 	
 public
 
-	def initialize(config)
+	def initialize(config, ip)
 		@config = config
+		@ip = ip
 	end
 
 	def update
@@ -43,7 +46,15 @@ public
 		puts "Updating #{@config[:host_path]}, replacing '#{old_ip}' to '#{new_ip}'"
 
 		content = get_host_data
+
+		#puts "Before ..."
+		#puts content
+
 		content = replace(content, old_ip, new_ip)
+
+		puts "After ..."
+		puts content
+
 		update_host(content)
 		store_ip(new_ip)
 		update_ds
@@ -65,16 +76,25 @@ private
 		vmrun = "#{@config[:vmware_app]}/Contents/Library/vmrun"
 		vm = "#{@config[:vm_path]}/Virtual Machines.localized/#{@config[:vm_name]}.vmwarevm/#{@config[:vm_name]}.vmx"
  		ip = `'#{vmrun}' getGuestIPAddress '#{vm}'`
- 		return ip.chomp
+ 		ip = ip.chomp
+ 		if(!ip.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'))
+ 			raise "couldn't retrieve ip address from the vm ..."
+ 		end
+ 		return ip
 	end
 
 	def retrieve_ip
-		ip = @config[:default_ip]
-		if File.exist?(@config[:last_ip_file]) 
+		ip = nil
+		if(@ip!=nil && @ip!="")
+			ip = @ip;
+		elsif File.exist?(@config[:last_ip_file]) 
 			ip = File.read(@config[:last_ip_file])
 			         .strip
 			         .chomp
+		else
+			@config[:default_ip]
 		end
+
 		return ip
 	end
 
@@ -93,5 +113,5 @@ private
 	end
 end
 
-host = HostIpSync.new(config)
+host = HostIpSync.new(config, ARGV[0])
 				 .update()
