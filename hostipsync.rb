@@ -86,13 +86,13 @@ private
 	def retrieve_ip
 		ip = nil
 		if(@ip!=nil && @ip!="")
-			ip = @ip;
+			ip = @ip
 		elsif File.exist?(@config[:last_ip_file]) 
 			ip = File.read(@config[:last_ip_file])
 			         .strip
 			         .chomp
 		else
-			@config[:default_ip]
+			ip = @config[:default_ip]
 		end
 
 		return ip
