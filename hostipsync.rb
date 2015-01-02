@@ -39,7 +39,7 @@ public
 		new_ip = get_vm_ip
 		
 		if(old_ip == new_ip)
-			puts "nothing to do ..."
+			puts "nothing to do ... ip address remains #{old_ip}"
 			return
 		end
 
