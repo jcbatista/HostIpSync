@@ -77,9 +77,6 @@ private
 		vm = "#{@config[:vm_path]}/Virtual Machines.localized/#{@config[:vm_name]}.vmwarevm/#{@config[:vm_name]}.vmx"
  		ip = `'#{vmrun}' getGuestIPAddress '#{vm}'`
  		ip = ip.chomp
-puts "#{@config[:vm_path]}/Virtual Machines.localized/#{@config[:vm_name]}.vmwarevm/#{@config[:vm_name]}.vmx"
-
-puts "********" + ip 
 
  		if(!ip.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'))
  			raise "couldn't retrieve ip address from the vm ..."
